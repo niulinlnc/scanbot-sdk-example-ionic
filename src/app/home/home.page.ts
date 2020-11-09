@@ -185,15 +185,11 @@ export class HomePage {
       return;
     }
 
-    const config: IDCardScannerConfiguration = {
-      finderTextHint: 'Please hold your phone over your ID Card.',
-      orientationLockMode: 'PORTRAIT',
-      // see further configs ...
-    };
+    const config: IDCardScannerConfiguration = {};
     const result = await this.scanbotService.SDK.UI.startIDCardScanner({uiConfigs: config});
     if (result.status === 'OK') {
-      const fields = result.idCardResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
-      await this.dialogsService.showAlert(fields.join(''), 'ID Card Result');
+      // const fields = result.idCardResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
+      // await this.dialogsService.showAlert(fields.join(''), 'ID Card Result');
     }
   }
     async setAcceptedFormats() {
