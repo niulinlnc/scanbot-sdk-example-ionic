@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
 import { Camera as ImagePicker } from '@ionic-native/camera/ngx';
 
-import ScanbotSdk, { HealthInsuranceCardScannerConfiguration, MrzScannerConfiguration } from 'cordova-plugin-scanbot-sdk';
+import ScanbotSdk, { HealthInsuranceCardScannerConfiguration, MrzScannerConfiguration, IDCardScannerConfiguration } from 'cordova-plugin-scanbot-sdk';
 
 import { DialogsService } from '../services/dialogs.service';
 import { ScanbotSdkDemoService } from '../services/scanbot-sdk-demo.service';
@@ -177,6 +177,23 @@ export class HomePage {
     if (result.status === 'OK') {
       const fields = result.ehicResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
       await this.dialogsService.showAlert(fields.join(''), 'EHIC Result');
+    }
+  }
+  async startIDCardScanner() {
+
+    if (!(await this.scanbotService.checkLicense())) {
+      return;
+    }
+
+    const config: IDCardScannerConfiguration = {
+      finderTextHint: 'Please hold your phone over your ID Card.',
+      orientationLockMode: 'PORTRAIT',
+      // see further configs ...
+    };
+    const result = await this.scanbotService.SDK.UI.startIDCardScanner({uiConfigs: config});
+    if (result.status === 'OK') {
+      const fields = result.ehicResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
+      await this.dialogsService.showAlert(fields.join(''), 'ID Card Result');
     }
   }
     async setAcceptedFormats() {
