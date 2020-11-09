@@ -192,7 +192,7 @@ export class HomePage {
     };
     const result = await this.scanbotService.SDK.UI.startIDCardScanner({uiConfigs: config});
     if (result.status === 'OK') {
-      const fields = result.ehicResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
+      const fields = result.idCardResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
       await this.dialogsService.showAlert(fields.join(''), 'ID Card Result');
     }
   }
