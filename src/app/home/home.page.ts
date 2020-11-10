@@ -179,6 +179,7 @@ export class HomePage {
       await this.dialogsService.showAlert(fields.join(''), 'EHIC Result');
     }
   }
+
   async startIDCardScanner() {
 
     if (!(await this.scanbotService.checkLicense())) {
@@ -188,11 +189,13 @@ export class HomePage {
     const config: IDCardScannerConfiguration = {};
     const result = await this.scanbotService.SDK.UI.startIDCardScanner({uiConfigs: config});
     if (result.status === 'OK') {
-      // const fields = result.idCardResult.fields.map(f => `<div>${f.type}: ${f.value} (${f.confidence.toFixed(2)})</div>`);
-      // await this.dialogsService.showAlert(fields.join(''), 'ID Card Result');
+      const keys = Object.keys(result);
+      const fields = keys.map(key => `<div>${JSON.stringify(result[key])}</div>`);
+      await this.dialogsService.showAlert(fields.join(''), 'ID Card Result');
     }
   }
-    async setAcceptedFormats() {
+
+  async setAcceptedFormats() {
     await this.router.navigateByUrl('/barcode-list');
   }
 
