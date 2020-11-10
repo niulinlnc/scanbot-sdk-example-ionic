@@ -56,7 +56,7 @@
     "codelyzer": "~4.5.0",
     "cordova-android": "8.1.0",
     "cordova-ios": "5.1.1",
-    "cordova-plugin-scanbot-sdk": "file:../scanbot-sdk-cordova-plugin/cordova-plugin-scanbot-sdk-4.3.2-beta3.tgz",
+    "cordova-plugin-scanbot-sdk": "file:../scanbot-sdk-cordova-plugin/cordova-plugin-scanbot-sdk-4.3.2-beta4.tgz",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "^4.0.1",
