@@ -42,7 +42,9 @@ export class HomePage {
   }
 
   async startDocumentScanner() {
-    if (!(await this.scanbotService.checkLicense())) { return; }
+//    if (!(await this.scanbotService.checkLicense())) { return; }
+    if (!(await this.scanbotService.checkPlugin())) { return; }
+
 
     const configs = this.scanbotService.globalDocScannerConfigs();
     const result = await this.scanbotService.SDK.UI.startDocumentScanner({uiConfigs: configs});
@@ -96,7 +98,7 @@ export class HomePage {
   }
 
   async startBarcodeScanner() {
-    if (!(await this.scanbotService.checkLicense())) { return; }
+    if (!(await this.scanbotService.checkPlugin())) { return; }
 
     const result = await this.scanbotService.SDK.UI.startBarcodeScanner({
       uiConfigs: {

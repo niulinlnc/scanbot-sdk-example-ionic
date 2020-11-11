@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { File } from '@ionic-native/file/ngx';
+import to from 'await-to-js';
 
 import ScanbotSdk, { DocumentScannerConfiguration, ScanbotSDKConfiguration } from 'cordova-plugin-scanbot-sdk';
 
@@ -19,6 +20,7 @@ export class ScanbotSdkDemoService {
      * or of your app (see config.xml <widget id="your.app.id" ...>).
      */
     private readonly myLicenseKey = '';
+    private _serviceInitialized = false;
 
     public SDK = ScanbotSdk.promisify();
 
@@ -30,22 +32,72 @@ export class ScanbotSdkDemoService {
 
     private initScanbotSdk() {
         // optional storageBaseDirectory - see the comments below.
-        const customStorageBaseDirectory = this.getDemoStorageBaseDirectory();
+        // const customStorageBaseDirectory = this.getDemoStorageBaseDirectory();
+        //
+        // const config: ScanbotSDKConfiguration = {
+        //     loggingEnabled: true, // Consider switching logging OFF in production builds for security and performance reasons!
+        //     licenseKey: this.myLicenseKey,
+        //     storageImageFormat: 'JPG',
+        //     storageImageQuality: 80,
+        //     storageBaseDirectory: customStorageBaseDirectory,
+        //     documentDetectorMode: 'ML_BASED'
+        // };
+        //
+        // return this.SDK.initializeSdk(config).then(result => {
+        //     console.log(JSON.stringify(result));
+        // }).catch((err) => {
+        //     console.error(JSON.stringify(err));
+        // });
 
-        const config: ScanbotSDKConfiguration = {
-            loggingEnabled: true, // Consider switching logging OFF in production builds for security and performance reasons!
-            licenseKey: this.myLicenseKey,
-            storageImageFormat: 'JPG',
-            storageImageQuality: 80,
-            storageBaseDirectory: customStorageBaseDirectory,
-            documentDetectorMode: 'ML_BASED'
-        };
+        if (!this._serviceInitialized && this.SDK) {
+            const config = {
+                licenseKey: this.myLicenseKey,
+                storageImageQuality: 80,
+                storageImageFormat: "JPG"
+            } as ScanbotSDKConfiguration;
+            const [error, result] = await to(this.SDK.initializeSdk(config));
+            if (result) {
+                console.log("init\", \"success initializing Scanbot plugin: ")
+                //   this.debug("init", "success initializing Scanbot plugin: " + JSON.stringify(result));
+                this._serviceInitialized = true;
+                await this.SDK.cleanup();
+            } else {
+                console.log("init error initializing Scanbot plugin:" )
+                //      this.error("init", "error initializing Scanbot plugin: " + JSON.stringify(error));
+            }
+        } else {
+            console.log("init, ScanbotPlugin not found")
+            //    this.error("init", "ScanbotPlugin not found");
+        }
+        return this._serviceInitialized;
 
-        return this.SDK.initializeSdk(config).then(result => {
-            console.log(JSON.stringify(result));
-        }).catch((err) => {
-            console.error(JSON.stringify(err));
-        });
+    }
+
+    /**
+     * Check Plugin initialization and license info
+     */
+    public async checkPlugin() {
+        let isLicenseValid = false;
+        if (!this._serviceInitialized) {
+            await this.initScanbotSdk();
+        }
+
+        console.log(!this.SDK)
+        if (!this._serviceInitialized || !this.SDK) {
+            //this.error("checkPlugin", "ScanbotPlugin not found");
+            console.log("ScanbotPlugin not found")
+        } else {
+            const [error, result] = await to(this.SDK.getLicenseInfo());
+            isLicenseValid = result && result.info && result.info.isLicenseValid;
+            if (isLicenseValid) {
+                console.log("success checking Scanbot License:")
+                //  this.debug("checkPlugin", "success checking Scanbot License: " + JSON.stringify(result));
+            } else {
+                //this.error("checkPlugin", "error checking Scanbot License: " + JSON.stringify(error));
+                console.log("error checking Scanbot License")
+            }
+        }
+        return isLicenseValid;
     }
 
     private getDemoStorageBaseDirectory(): string {
